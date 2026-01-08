@@ -1,0 +1,102 @@
+<div class="bg-white p-4 rounded-lg shadow-sm border space-y-4">
+  <!-- Barre de recherche -->
+  <div class="relative">
+    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+    </div>
+    <input
+      type="text"
+      [formControl]="searchControl"
+      placeholder="Rechercher des memes..."
+      class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+    />
+  </div>
+
+  <!-- Filtres par tags -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="flex items-center space-x-2">
+      <span class="text-sm font-medium text-gray-700">Filtrer par tags :</span>
+
+      <!-- Dropdown tags -->
+      <div class="relative">
+        <button
+          type="button"
+          (click)="toggleTagDropdown()"
+          class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+          </svg>
+          Tags
+          <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+
+        @if (showTagDropdown) {
+          <div class="absolute left-0 mt-2 w-64 bg-white shadow-lg rounded-lg border z-10">
+            <div class="p-4 max-h-64 overflow-y-auto">
+              @if (availableTags.length > 0) {
+                <div class="space-y-2">
+                  @for (tag of availableTags; track tag.id) {
+                    <button
+                      type="button"
+                      (click)="onTagSelect(tag)"
+                      [class]="'w-full text-left px-3 py-2 text-sm rounded-md transition-colors ' +
+                              (isTagSelected(tag)
+                                ? 'bg-primary-100 text-primary-800 cursor-not-allowed'
+                                : 'text-gray-700 hover:bg-gray-100')"
+                      [disabled]="isTagSelected(tag)"
+                    >
+                      #{{ tag.name }}
+                      @if (isTagSelected(tag)) {
+                        <span class="float-right text-primary-600">✓</span>
+                      }
+                    </button>
+                  }
+                </div>
+              } @else {
+                <p class="text-gray-500 text-center py-4">Aucun tag disponible</p>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Bouton clear -->
+    @if (searchControl.value || selectedTags.length > 0) {
+      <button
+        type="button"
+        (click)="clearAll()"
+        class="text-sm text-gray-600 hover:text-gray-800 underline"
+      >
+        Effacer tous les filtres
+      </button>
+    }
+  </div>
+
+  <!-- Tags sélectionnés -->
+  @if (selectedTags.length > 0) {
+    <div>
+      <div class="flex flex-wrap gap-2">
+        @for (tag of selectedTags; track tag.id) {
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary-100 text-primary-800">
+            #{{ tag.name }}
+            <button
+              type="button"
+              (click)="onTagRemove(tag)"
+              class="ml-2 text-primary-600 hover:text-primary-800 focus:outline-none"
+            >
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </span>
+        }
+      </div>
+    </div>
+  }
+</div>

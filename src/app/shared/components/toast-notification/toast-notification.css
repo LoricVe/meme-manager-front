@@ -1,0 +1,51 @@
+/* Animation de la barre de progression */
+@keyframes progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.animate-progress {
+  animation-name: progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+/* Amélioration du style des alertes */
+:host ::ng-deep .alert {
+  position: relative;
+  overflow: hidden;
+  min-width: 320px;
+  max-width: 400px;
+  backdrop-filter: blur(8px);
+  border-width: 1px;
+}
+
+/* Effet de hover plus prononcé */
+:host ::ng-deep .alert:hover {
+  transform: scale(1.02);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Style spécifique pour les notifications de like */
+:host ::ng-deep .bg-pink-50 {
+  background-color: #fdf2f8;
+  border-color: #fbcfe8;
+}
+
+/* Style spécifique pour les notifications de commentaire */
+:host ::ng-deep .bg-blue-50 {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  :host ::ng-deep .alert {
+    min-width: 280px;
+    max-width: calc(100vw - 2rem);
+  }
+}

@@ -1,0 +1,44 @@
+<div class="user-avatar-container" (clickOutside)="closeDropdown()">
+  <button
+    class="avatar-button"
+    (click)="toggleDropdown()"
+    [attr.aria-expanded]="isDropdownOpen"
+    aria-label="User menu"
+  >
+    <div class="avatar-circle" *ngIf="!avatarUrl">
+      {{ userInitials }}
+    </div>
+    <img *ngIf="avatarUrl"
+         [src]="avatarUrl"
+         [alt]="userName"
+         class="w-10 h-10 rounded-full object-cover">
+  </button>
+
+  <div class="dropdown-menu" [class.show]="isDropdownOpen">
+    <div class="dropdown-header">
+      <div class="user-info">
+        <div class="user-name">{{ userName }}</div>
+        <div class="user-email">{{ userEmail }}</div>
+      </div>
+    </div>
+
+    <div class="dropdown-divider"></div>
+
+    <button class="dropdown-item" (click)="goToProfile()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <span>Mon profil</span>
+    </button>
+
+    <button class="dropdown-item" (click)="logout()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      <span>Déconnexion</span>
+    </button>
+  </div>
+</div>

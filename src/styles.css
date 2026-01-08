@@ -1,1 +1,21 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-primary:hover {
+    @apply bg-primary-700;
+  }
+
+  .card {
+    @apply bg-white shadow-sm rounded-lg p-4 border border-gray-200 transition-all;
+  }
+
+  .card:hover {
+    @apply shadow-lg;
+  }
+}

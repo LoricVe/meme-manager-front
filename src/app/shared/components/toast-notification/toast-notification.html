@@ -1,0 +1,62 @@
+<!-- Container de notifications en bas à droite -->
+<div class="fixed bottom-4 right-4 z-50 flex flex-col gap-3 max-w-md">
+  @for (notification of notifications; track notification.id) {
+    <div
+      [@slideIn]
+      [class]="getNotificationClass(notification.type)"
+      (click)="onNotificationClick(notification)"
+      role="alert"
+    >
+      <div class="flex items-start gap-3 w-full">
+        <!-- Icône -->
+        <div class="flex-shrink-0 text-2xl">
+          {{ getIcon(notification.type) }}
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="flex-1 min-w-0">
+          <!-- En-tête avec titre et bouton fermer -->
+          <div class="flex items-start justify-between gap-2 mb-1">
+            <h3 class="font-bold text-sm">{{ notification.title }}</h3>
+            <button
+              (click)="closeNotification(notification, $event)"
+              class="btn btn-ghost btn-xs btn-circle hover:bg-black/10 flex-shrink-0"
+              aria-label="Fermer"
+            >
+              ✕
+            </button>
+          </div>
+
+          <!-- Message -->
+          <p class="text-sm opacity-90">{{ notification.message }}</p>
+
+          <!-- Image du mème pour les notifications de likes/commentaires -->
+          @if (notification.memeThumbnail && (notification.type === 'like' || notification.type === 'comment')) {
+            <div class="mt-2">
+              <img
+                [src]="notification.memeThumbnail"
+                alt="Mème"
+                class="w-16 h-16 object-cover rounded-lg border-2 border-white/20"
+              />
+            </div>
+          }
+
+          <!-- Timestamp -->
+          <div class="text-xs opacity-70 mt-1">
+            {{ getTimeAgo(notification.timestamp) }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Barre de progression pour l'auto-dismiss -->
+      @if (notification.duration) {
+        <div class="absolute bottom-0 left-0 right-0 h-1 bg-black/10 rounded-b-lg overflow-hidden">
+          <div
+            class="h-full bg-current opacity-30 animate-progress"
+            [style.animation-duration.ms]="notification.duration"
+          ></div>
+        </div>
+      }
+    </div>
+  }
+</div>
