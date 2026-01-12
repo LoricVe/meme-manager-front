@@ -15,8 +15,10 @@ import { MemeService } from '../../services/meme.service';
 export class MemeCardComponent {
   @Input() meme!: Meme;
   @Input() showActions = true;
+  @Input() isDraft = false;
   @Output() memeClicked = new EventEmitter<Meme>();
   @Output() memeDeleted = new EventEmitter<string>();
+  @Output() memePublished = new EventEmitter<string>();
 
   currentUser: User | null = null;
 
@@ -101,15 +103,32 @@ export class MemeCardComponent {
   onDelete(event: Event): void {
     event.stopPropagation(); // Empêcher le clic sur la carte
 
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce meme ?')) {
+    const message = this.isDraft
+      ? 'Êtes-vous sûr de vouloir supprimer ce brouillon ?'
+      : 'Êtes-vous sûr de vouloir supprimer ce meme ?';
+
+    if (confirm(message)) {
       this.memeService.deleteMemeObservable(this.meme.id).subscribe({
         next: () => {
           this.memeDeleted.emit(this.meme.id);
         },
         error: (error) => {
           console.error('Erreur lors de la suppression:', error);
-          alert('Erreur lors de la suppression du meme');
+          alert('Erreur lors de la suppression');
         }
+      });
+    }
+  }
+
+  onPublish(event: Event): void {
+    event.stopPropagation(); // Empêcher le clic sur la carte
+
+    if (confirm('Voulez-vous publier ce brouillon ? Il sera visible par tous.')) {
+      this.memeService.publishDraft(this.meme.id).then(() => {
+        this.memePublished.emit(this.meme.id);
+      }).catch((error) => {
+        console.error('Erreur lors de la publication:', error);
+        alert('Erreur lors de la publication du brouillon');
       });
     }
   }

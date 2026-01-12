@@ -1,0 +1,128 @@
+<!-- Layout style réseau social avec feed centré -->
+<div class="max-w-7xl mx-auto px-4 py-6">
+  <!-- En-tête -->
+  <div class="mb-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Mes Brouillons</h1>
+        <p class="text-sm text-gray-500 mt-1">Vos memes en attente de publication</p>
+      </div>
+
+      <a
+        routerLink="/create-meme"
+        class="hidden sm:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        <span>Créer</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- État de chargement initial -->
+  @if (isLoading && drafts.length === 0) {
+    <div class="flex flex-col items-center justify-center py-16">
+      <div class="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mb-4"></div>
+      <span class="text-gray-600 font-medium">Chargement des brouillons...</span>
+    </div>
+  }
+
+  <!-- Message d'erreur -->
+  @if (error) {
+    <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg mb-6">
+      <div class="flex items-center gap-3">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <div class="flex-1">
+          <p class="font-medium">{{ error }}</p>
+        </div>
+        <button
+          (click)="loadDrafts(true)"
+          class="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg transition-colors font-medium text-sm"
+        >
+          Réessayer
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Liste des brouillons -->
+  @if (drafts.length > 0) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      @for (draft of drafts; track trackByMemeId($index, draft)) {
+        <app-meme-card
+          [meme]="draft"
+          [isDraft]="true"
+          (memeClicked)="onMemeClicked($event)"
+          (memeDeleted)="onMemeDeleted($event)"
+          (memePublished)="onMemePublished($event)"
+          class="block"
+        ></app-meme-card>
+      }
+    </div>
+
+    <!-- Bouton "Charger plus" -->
+    @if (hasMore) {
+      <div class="flex justify-center mb-6">
+        <button
+          (click)="loadMore()"
+          [disabled]="isLoading"
+          class="px-8 py-3 bg-white border-2 border-gray-200 text-gray-700 font-semibold rounded-full hover:border-purple-500 hover:text-purple-600 hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          @if (isLoading) {
+            <span class="inline-flex items-center gap-2">
+              <div class="w-4 h-4 border-2 border-gray-300 border-t-purple-600 rounded-full animate-spin"></div>
+              <span>Chargement...</span>
+            </span>
+          } @else {
+            <span class="inline-flex items-center gap-2">
+              <span>Voir plus de brouillons</span>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </span>
+          }
+        </button>
+      </div>
+    }
+
+    <!-- Info pagination -->
+    <div class="text-center">
+      <p class="text-sm text-gray-400">{{ drafts.length }} brouillon{{ drafts.length > 1 ? 's' : '' }} affiché{{ drafts.length > 1 ? 's' : '' }}</p>
+    </div>
+  }
+
+  <!-- État vide -->
+  @if (!isLoading && drafts.length === 0 && !error) {
+    <div class="flex flex-col items-center justify-center py-16 text-center">
+      <div class="w-32 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mb-6">
+        <span class="text-6xl">📝</span>
+      </div>
+      <h3 class="text-2xl font-bold text-gray-900 mb-2">
+        Aucun brouillon
+      </h3>
+      <p class="text-gray-500 mb-8 max-w-md">
+        Vous n'avez pas encore de brouillons en attente. Créez un mème et enregistrez-le en brouillon pour le publier plus tard !
+      </p>
+
+      <a
+        routerLink="/create-meme"
+        class="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-full hover:shadow-xl hover:scale-105 transition-all"
+      >
+        Créer un mème
+      </a>
+    </div>
+  }
+</div>
+
+<!-- Bouton flottant de création (mobile uniquement) -->
+<a
+  routerLink="/create-meme"
+  class="sm:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform z-40"
+>
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+  </svg>
+</a>

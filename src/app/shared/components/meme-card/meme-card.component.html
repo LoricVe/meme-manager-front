@@ -31,6 +31,18 @@
 
       @if (canEditMeme()) {
         <div class="flex gap-1">
+          @if (isDraft) {
+            <button
+              (click)="onPublish($event)"
+              class="p-2 hover:bg-green-50 rounded-full transition-colors"
+              title="Publier"
+            >
+              <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </button>
+          }
+
           <button
             (click)="onEdit($event)"
             class="p-2 hover:bg-blue-50 rounded-full transition-colors"

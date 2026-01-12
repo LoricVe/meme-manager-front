@@ -31,7 +31,15 @@ export class MemeService {
     return new Observable(observer => {
       this.apiService.requestApi('/items/memes', 'GET', params)
         .then(response => {
-          observer.next(response);
+          // Filtrer les brouillons côté client pour éviter les problèmes de permissions
+          // Ne garder que les memes qui ne sont PAS des brouillons (published, archived, null, undefined)
+          const filteredData = response.data.filter((meme: Meme) => {
+            return !meme.status || meme.status !== 'draft';
+          });
+          observer.next({
+            data: filteredData,
+            meta: response.meta
+          });
           observer.complete();
         })
         .catch(error => {
@@ -105,7 +113,10 @@ export class MemeService {
         tags: memeData.tags?.map(tagId => ({ tags_id: tagId })) || []
       };
 
+      console.log('📤 Payload envoyé à Directus:', memePayload);
       const response = await this.apiService.requestApi('/items/memes', 'POST', memePayload);
+      console.log('📥 Réponse de Directus:', response.data);
+      console.log('🔍 Statut retourné:', response.data.status);
       return response.data;
     } catch (error) {
       console.error('Erreur lors de la création du meme:', error);
@@ -175,6 +186,65 @@ export class MemeService {
     };
 
     const response = await this.apiService.requestApi('/items/memes', 'GET', params);
+    return response.data;
+  }
+
+  // Récupérer les brouillons de l'utilisateur connecté
+  getUserDrafts(page: number = 1, limit: number = 12): Observable<{data: Meme[], meta: any}> {
+    const user = JSON.parse(localStorage.getItem('directus_user') || '{}');
+    const userId = user.id;
+
+    if (!userId) {
+      return new Observable(observer => {
+        observer.error(new Error('Utilisateur non connecté'));
+      });
+    }
+
+    // Récupérer TOUS les memes sans filtre pour éviter les erreurs 403
+    let params: any = {
+      limit: 200, // Récupérer beaucoup de memes pour filtrer côté client
+      offset: 0,
+      fields: ['*', 'user_created.id', 'user_created.first_name', 'user_created.last_name', 'user_created.email', 'user_created.avatar', 'tags.tags_id.name'].join(','),
+      sort: '-date_created'
+    };
+
+    return new Observable(observer => {
+      this.apiService.requestApi('/items/memes', 'GET', params)
+        .then(response => {
+          // Filtrer côté client : uniquement les brouillons de l'utilisateur connecté
+          const drafts = response.data.filter((meme: Meme) => {
+            const creatorId = typeof meme.user_created === 'string'
+              ? meme.user_created
+              : meme.user_created?.id;
+            return meme.status === 'draft' && creatorId === userId;
+          });
+
+          // Appliquer la pagination côté client
+          const startIndex = (page - 1) * limit;
+          const endIndex = startIndex + limit;
+          const paginatedDrafts = drafts.slice(startIndex, endIndex);
+
+          observer.next({
+            data: paginatedDrafts,
+            meta: {
+              filter_count: drafts.length,
+              total_count: drafts.length,
+              limit: limit
+            }
+          });
+          observer.complete();
+        })
+        .catch(error => {
+          observer.error(error);
+        });
+    });
+  }
+
+  // Publier un brouillon
+  async publishDraft(memeId: string): Promise<Meme> {
+    const response = await this.apiService.requestApi(`/items/memes/${memeId}`, 'PATCH', {
+      status: 'published'
+    });
     return response.data;
   }
 

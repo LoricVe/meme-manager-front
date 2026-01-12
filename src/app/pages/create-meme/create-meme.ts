@@ -142,8 +142,17 @@ export class CreateMeme implements OnInit {
 
   private async createMeme(data: any): Promise<void> {
     try {
+      console.log('📝 Données de création du mème:', data);
       const meme = await this.memeService.createMeme(data);
-      this.router.navigate(['/meme', meme.id]);
+      console.log('✅ Mème créé:', meme);
+
+      // Rediriger vers les brouillons si c'est un brouillon, sinon vers le détail du mème
+      if (data.status === 'draft') {
+        this.notificationService.success('Brouillon créé', 'Votre brouillon a été enregistré avec succès');
+        this.router.navigate(['/my-drafts']);
+      } else {
+        this.router.navigate(['/meme', meme.id]);
+      }
     } catch (error) {
       this.error = 'Erreur lors de la création du meme';
       this.isLoading = false;

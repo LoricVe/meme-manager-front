@@ -9,6 +9,7 @@ import { AuthCallbackComponent } from './pages/auth-callback/auth-callback.compo
 import { ProfileComponent } from './pages/profile/profile.component';
 import { AdminMemesComponent } from './pages/admin/admin-memes/admin-memes';
 import { AdminTagsComponent } from './pages/admin/admin-tags/admin-tags';
+import { MyDrafts } from './pages/my-drafts/my-drafts';
 
 const routes: Routes = [
   {
@@ -45,6 +46,11 @@ const routes: Routes = [
   {
     path: 'profile',
     component: ProfileComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'my-drafts',
+    component: MyDrafts,
     canActivate: [AuthGuard]
   },
   {

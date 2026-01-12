@@ -22,6 +22,7 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { ToastNotification } from './shared/components/toast-notification/toast-notification';
 import { AdminMemesComponent } from './pages/admin/admin-memes/admin-memes';
 import { AdminTagsComponent } from './pages/admin/admin-tags/admin-tags';
+import { MyDrafts } from './pages/my-drafts/my-drafts';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { AdminTagsComponent } from './pages/admin/admin-tags/admin-tags';
     ProfileComponent,
     ToastNotification,
     AdminMemesComponent,
-    AdminTagsComponent
+    AdminTagsComponent,
+    MyDrafts
   ],
   imports: [
     BrowserModule,
